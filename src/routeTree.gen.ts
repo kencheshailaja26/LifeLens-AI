@@ -14,6 +14,7 @@ import { Route as ActionsRouteImport } from './routes/actions'
 import { Route as AssistantRouteImport } from './routes/assistant'
 import { Route as DocumentsRouteImport } from './routes/documents'
 import { Route as InboxRouteImport } from './routes/inbox'
+import { Route as LandingRouteImport } from './routes/landing'
 import { Route as RemindersRouteImport } from './routes/reminders'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as TimelineRouteImport } from './routes/timeline'
@@ -43,6 +44,11 @@ const InboxRoute = InboxRouteImport.update({
   path: '/inbox',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LandingRoute = LandingRouteImport.update({
+  id: '/landing',
+  path: '/landing',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RemindersRoute = RemindersRouteImport.update({
   id: '/reminders',
   path: '/reminders',
@@ -65,6 +71,7 @@ export interface FileRoutesByFullPath {
   '/assistant': typeof AssistantRoute
   '/documents': typeof DocumentsRoute
   '/inbox': typeof InboxRoute
+  '/landing': typeof LandingRoute
   '/reminders': typeof RemindersRoute
   '/settings': typeof SettingsRoute
   '/timeline': typeof TimelineRoute
@@ -75,6 +82,7 @@ export interface FileRoutesByTo {
   '/assistant': typeof AssistantRoute
   '/documents': typeof DocumentsRoute
   '/inbox': typeof InboxRoute
+  '/landing': typeof LandingRoute
   '/reminders': typeof RemindersRoute
   '/settings': typeof SettingsRoute
   '/timeline': typeof TimelineRoute
@@ -86,6 +94,7 @@ export interface FileRoutesById {
   '/assistant': typeof AssistantRoute
   '/documents': typeof DocumentsRoute
   '/inbox': typeof InboxRoute
+  '/landing': typeof LandingRoute
   '/reminders': typeof RemindersRoute
   '/settings': typeof SettingsRoute
   '/timeline': typeof TimelineRoute
@@ -98,6 +107,7 @@ export interface FileRouteTypes {
     | '/assistant'
     | '/documents'
     | '/inbox'
+    | '/landing'
     | '/reminders'
     | '/settings'
     | '/timeline'
@@ -108,6 +118,7 @@ export interface FileRouteTypes {
     | '/assistant'
     | '/documents'
     | '/inbox'
+    | '/landing'
     | '/reminders'
     | '/settings'
     | '/timeline'
@@ -118,6 +129,7 @@ export interface FileRouteTypes {
     | '/assistant'
     | '/documents'
     | '/inbox'
+    | '/landing'
     | '/reminders'
     | '/settings'
     | '/timeline'
@@ -129,6 +141,7 @@ export interface RootRouteChildren {
   AssistantRoute: typeof AssistantRoute
   DocumentsRoute: typeof DocumentsRoute
   InboxRoute: typeof InboxRoute
+  LandingRoute: typeof LandingRoute
   RemindersRoute: typeof RemindersRoute
   SettingsRoute: typeof SettingsRoute
   TimelineRoute: typeof TimelineRoute
@@ -171,6 +184,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InboxRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/landing': {
+      id: '/landing'
+      path: '/landing'
+      fullPath: '/landing'
+      preLoaderRoute: typeof LandingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/reminders': {
       id: '/reminders'
       path: '/reminders'
@@ -201,6 +221,7 @@ const rootRouteChildren: RootRouteChildren = {
   AssistantRoute: AssistantRoute,
   DocumentsRoute: DocumentsRoute,
   InboxRoute: InboxRoute,
+  LandingRoute: LandingRoute,
   RemindersRoute: RemindersRoute,
   SettingsRoute: SettingsRoute,
   TimelineRoute: TimelineRoute,
