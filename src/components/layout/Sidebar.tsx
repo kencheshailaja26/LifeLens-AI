@@ -4,7 +4,7 @@ import { ScanLine, X } from "lucide-react";
 import { mainNav, managementNav, settingsNav, type NavItem } from "@/config/navigation";
 import { cn } from "@/lib/utils";
 
-function NavLink({ item, onNavigate }: { item: NavItem; onNavigate?: () => void }) {
+function NavLink({ item, onNavigate }: { item: NavItem; onNavigate?: (() => void) | undefined }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const active = pathname === item.to;
   const Icon = item.icon;
@@ -39,7 +39,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
+export function SidebarContent({ onNavigate }: { onNavigate?: (() => void) | undefined }) {
   return (
     <div className="flex h-full flex-col bg-sidebar">
       <div className="flex items-center justify-between gap-2 px-5 py-5">
