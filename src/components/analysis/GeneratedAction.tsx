@@ -8,7 +8,7 @@ export type GeneratedActionItem = {
   id: string;
   title: string;
   due: string;
-  dueLabel?: string;
+  dueLabel?: string | undefined;
   priority: ActionPriorityLevel;
   source: string;
   explanation: string;

@@ -18,6 +18,7 @@ import { Route as LandingRouteImport } from './routes/landing'
 import { Route as RemindersRouteImport } from './routes/reminders'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as TimelineRouteImport } from './routes/timeline'
+import { Route as AnalysisDocumentIdRouteImport } from './routes/analysis.$documentId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -64,6 +65,11 @@ const TimelineRoute = TimelineRouteImport.update({
   path: '/timeline',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AnalysisDocumentIdRoute = AnalysisDocumentIdRouteImport.update({
+  id: '/analysis/$documentId',
+  path: '/analysis/$documentId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -75,6 +81,7 @@ export interface FileRoutesByFullPath {
   '/reminders': typeof RemindersRoute
   '/settings': typeof SettingsRoute
   '/timeline': typeof TimelineRoute
+  '/analysis/$documentId': typeof AnalysisDocumentIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -86,6 +93,7 @@ export interface FileRoutesByTo {
   '/reminders': typeof RemindersRoute
   '/settings': typeof SettingsRoute
   '/timeline': typeof TimelineRoute
+  '/analysis/$documentId': typeof AnalysisDocumentIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -98,6 +106,7 @@ export interface FileRoutesById {
   '/reminders': typeof RemindersRoute
   '/settings': typeof SettingsRoute
   '/timeline': typeof TimelineRoute
+  '/analysis/$documentId': typeof AnalysisDocumentIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -111,6 +120,7 @@ export interface FileRouteTypes {
     | '/reminders'
     | '/settings'
     | '/timeline'
+    | '/analysis/$documentId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -122,6 +132,7 @@ export interface FileRouteTypes {
     | '/reminders'
     | '/settings'
     | '/timeline'
+    | '/analysis/$documentId'
   id:
     | '__root__'
     | '/'
@@ -133,6 +144,7 @@ export interface FileRouteTypes {
     | '/reminders'
     | '/settings'
     | '/timeline'
+    | '/analysis/$documentId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -145,6 +157,7 @@ export interface RootRouteChildren {
   RemindersRoute: typeof RemindersRoute
   SettingsRoute: typeof SettingsRoute
   TimelineRoute: typeof TimelineRoute
+  AnalysisDocumentIdRoute: typeof AnalysisDocumentIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -212,6 +225,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TimelineRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/analysis/$documentId': {
+      id: '/analysis/$documentId'
+      path: '/analysis/$documentId'
+      fullPath: '/analysis/$documentId'
+      preLoaderRoute: typeof AnalysisDocumentIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -225,6 +245,7 @@ const rootRouteChildren: RootRouteChildren = {
   RemindersRoute: RemindersRoute,
   SettingsRoute: SettingsRoute,
   TimelineRoute: TimelineRoute,
+  AnalysisDocumentIdRoute: AnalysisDocumentIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
