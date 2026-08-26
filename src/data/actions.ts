@@ -1,3 +1,5 @@
+import type { PriorityInput } from "@/lib/prioritize";
+
 export type Priority = "high" | "medium" | "low";
 
 export type ActionCategory =
@@ -15,7 +17,10 @@ export type ActionItem = {
   title: string;
   description: string;
   due: string;
-  priority: Priority;
+  /** Signals LifeLens AI uses to compute priority. */
+  signals: PriorityInput;
+  /** Set when the user overrides the AI priority — always preserved. */
+  manualPriority?: Priority;
   category: ActionCategory;
   source: string;
   explanation?: string;
@@ -38,7 +43,12 @@ export const initialActions: ActionItem[] = [
     title: "Submit internship documents",
     description: "Upload ID proof, academic certificate, bank details and photograph to the HR portal.",
     due: "Due tomorrow",
-    priority: "high",
+    signals: {
+      dueInDays: 1,
+      importance: "critical",
+      consequence: "severe",
+      blocks: "your onboarding on day one",
+    },
     category: "Career",
     source: "Internship_Offer.pdf",
     explanation: "Required documents must be submitted before the onboarding deadline.",
@@ -50,7 +60,7 @@ export const initialActions: ActionItem[] = [
     title: "Pay electricity bill",
     description: "Bill amount ₹2,480 — a late fee applies after the due date.",
     due: "Due tomorrow",
-    priority: "high",
+    signals: { dueInDays: 1, importance: "significant", consequence: "severe" },
     category: "Bills",
     source: "Electricity_Bill.pdf",
     explanation: "The bill states a penalty is charged for payments made after the due date.",
@@ -62,7 +72,12 @@ export const initialActions: ActionItem[] = [
     title: "Complete scholarship application",
     description: "Fill the online form and attach your income certificate.",
     due: "Due Friday",
-    priority: "medium",
+    signals: {
+      dueInDays: 4,
+      importance: "critical",
+      consequence: "moderate",
+      blocks: "the scholarship interview round",
+    },
     category: "Education",
     source: "Scholarship_Form.pdf",
     explanation: "The form lists Friday as the final submission date for this cycle.",
@@ -71,13 +86,13 @@ export const initialActions: ActionItem[] = [
   },
   {
     id: "ac4",
-    title: "Register for event",
-    description: "Confirm your seat for the campus tech meetup.",
-    due: "Due Sunday",
-    priority: "low",
+    title: "Read event information",
+    description: "Go through the agenda for the campus tech meetup and confirm your seat.",
+    due: "Due next week",
+    signals: { dueInDays: 9, importance: "routine", consequence: "minor" },
     category: "Events",
     source: "Event_Invitation.png",
-    explanation: "Registration closes on Sunday according to the invitation.",
+    explanation: "Registration closes next week according to the invitation.",
     status: "upcoming",
     completed: false,
   },
@@ -86,7 +101,12 @@ export const initialActions: ActionItem[] = [
     title: "Renew passport appointment",
     description: "Book a slot at your local passport office.",
     due: "Due Saturday",
-    priority: "medium",
+    signals: {
+      dueInDays: 5,
+      importance: "significant",
+      consequence: "moderate",
+      blocks: "your visa application",
+    },
     category: "Travel",
     source: "Passport_Notice.pdf",
     explanation: "Slot booking opens this week and fills quickly.",
@@ -98,7 +118,7 @@ export const initialActions: ActionItem[] = [
     title: "Submit rent agreement signature",
     description: "Return the signed copy to your landlord.",
     due: "Overdue by 2 days",
-    priority: "high",
+    signals: { dueInDays: -2, importance: "significant", consequence: "severe" },
     category: "Personal",
     source: "Rent_Agreement_Scan.jpg",
     explanation: "The agreement required a signed copy within 7 days of receipt.",
@@ -110,7 +130,7 @@ export const initialActions: ActionItem[] = [
     title: "Reply to scholarship confirmation email",
     description: "Confirm attendance for the orientation call.",
     due: "Completed",
-    priority: "low",
+    signals: { dueInDays: 10, importance: "routine", consequence: "minor" },
     category: "Education",
     source: "Scholarship_Email",
     status: "completed",
@@ -121,7 +141,7 @@ export const initialActions: ActionItem[] = [
     title: "Web check-in for flight 6E-2143",
     description: "Seat selected and boarding pass downloaded.",
     due: "Completed",
-    priority: "medium",
+    signals: { dueInDays: 2, importance: "significant", consequence: "moderate" },
     category: "Travel",
     source: "Flight_Ticket.png",
     status: "completed",
@@ -132,7 +152,7 @@ export const initialActions: ActionItem[] = [
     title: "Upload joining photograph",
     description: "Passport size photo uploaded to the HR portal.",
     due: "Completed",
-    priority: "low",
+    signals: { dueInDays: 6, importance: "routine", consequence: "minor" },
     category: "Career",
     source: "Internship_Offer.pdf",
     status: "completed",
@@ -143,7 +163,7 @@ export const initialActions: ActionItem[] = [
     title: "Pay broadband bill",
     description: "Monthly broadband payment settled online.",
     due: "Completed",
-    priority: "medium",
+    signals: { dueInDays: 3, importance: "significant", consequence: "moderate" },
     category: "Bills",
     source: "Broadband_Bill.pdf",
     status: "completed",
@@ -154,7 +174,7 @@ export const initialActions: ActionItem[] = [
     title: "Confirm hostel checkout date",
     description: "Checkout confirmed with the warden's office.",
     due: "Completed",
-    priority: "low",
+    signals: { dueInDays: 12, importance: "routine", consequence: "minor" },
     category: "Personal",
     source: "Hostel_Notice.pdf",
     status: "completed",

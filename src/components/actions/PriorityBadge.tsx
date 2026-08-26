@@ -1,3 +1,5 @@
+import { Sparkles, UserRoundCog } from "lucide-react";
+
 import { cn } from "@/lib/utils";
 import type { Priority } from "@/data/actions";
 
@@ -21,9 +23,11 @@ const labels: Record<Priority, string> = {
 
 export function PriorityBadge({
   priority,
+  source,
   className,
 }: {
   priority: Priority;
+  source?: "ai" | "manual";
   className?: string;
 }) {
   return (
@@ -36,6 +40,27 @@ export function PriorityBadge({
     >
       <span className={cn("h-1.5 w-1.5 rounded-full", dots[priority])} />
       {labels[priority]}
+      {source === "manual" ? <UserRoundCog className="h-3 w-3 opacity-70" /> : null}
+    </span>
+  );
+}
+
+export function AIPriorityIndicator({
+  manual,
+  className,
+}: {
+  manual?: boolean;
+  className?: string;
+}) {
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary",
+        className,
+      )}
+    >
+      <Sparkles className="h-3 w-3" />
+      {manual ? "Priority set by you" : "Prioritized by LifeLens AI"}
     </span>
   );
 }
