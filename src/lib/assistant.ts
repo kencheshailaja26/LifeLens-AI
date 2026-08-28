@@ -1,5 +1,5 @@
 import { initialActions, type ActionItem } from "@/data/actions";
-import { resolvePriority } from "@/lib/prioritize";
+import { prioritize } from "@/lib/prioritize";
 
 export type AssistantAnswer = {
   text: string;
@@ -19,7 +19,7 @@ export const suggestedQuestions = [
   "Show me everything related to my internship.",
 ];
 
-const priorityOf = (a: ActionItem) => resolvePriority(a.signals, a.manualPriority).priority;
+const priorityOf = (a: ActionItem): "high" | "medium" | "low" => prioritize(a.signals, a.manualPriority).priority;
 
 const rank = { high: 0, medium: 1, low: 2 } as const;
 
@@ -66,7 +66,7 @@ export function answerQuestion(question: string): AssistantAnswer {
   if (has("first", "start with", "do next", "next task", "prioritise", "prioritize")) {
     const [top] = sortByUrgency(open());
     if (!top) return { text: "You have no open actions left.", sources: [], found: true };
-    const p = resolvePriority(top.signals, top.manualPriority);
+    const p = prioritize(top.signals, top.manualPriority);
     return {
       text: `You should ${top.title.toLowerCase()} first. It's ${top.due.toLowerCase()} and marked ${p.priority} priority. ${p.explanation}`,
       sources: [top.source],
