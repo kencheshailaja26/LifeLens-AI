@@ -3,16 +3,27 @@ import {
   CalendarClock,
   Check,
   FileText,
+  Flag,
   Info,
   Link2,
+  MoreVertical,
   Pencil,
   Trash2,
 } from "lucide-react";
 
 import { AIPriorityIndicator, PriorityBadge } from "@/components/actions/PriorityBadge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import type { ActionItem, Priority } from "@/data/actions";
 import { prioritize } from "@/lib/prioritize";
+
 
 const priorityOptions: { value: Priority; label: string }[] = [
   { value: "high", label: "High" },
