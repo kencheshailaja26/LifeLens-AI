@@ -3,16 +3,27 @@ import {
   CalendarClock,
   Check,
   FileText,
+  Flag,
   Info,
   Link2,
+  MoreVertical,
   Pencil,
   Trash2,
 } from "lucide-react";
 
 import { AIPriorityIndicator, PriorityBadge } from "@/components/actions/PriorityBadge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import type { ActionItem, Priority } from "@/data/actions";
 import { prioritize } from "@/lib/prioritize";
+
 
 const priorityOptions: { value: Priority; label: string }[] = [
   { value: "high", label: "High" },
@@ -141,6 +152,49 @@ export function ActionListItem({
         </div>
 
         <div className="flex shrink-0 flex-col gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              aria-label={`More options: ${action.title}`}
+              className="rounded-lg border border-border p-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+            >
+              <MoreVertical className="h-4 w-4" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-52">
+              <DropdownMenuItem onSelect={() => onToggleComplete(action.id)}>
+                <Check className="h-4 w-4" />
+                {action.completed ? "Mark as not done" : "Complete"}
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => setEditing(true)}>
+                <Pencil className="h-4 w-4" />
+                Edit
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel className="text-[11px] uppercase tracking-wide text-muted-foreground">
+                Change priority
+              </DropdownMenuLabel>
+              {priorityOptions.map((option) => (
+                <DropdownMenuItem
+                  key={option.value}
+                  onSelect={() => onPriorityChange(action.id, option.value)}
+                >
+                  <Flag className="h-4 w-4" />
+                  {option.label}
+                </DropdownMenuItem>
+              ))}
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onSelect={() => setEditing(true)}>
+                <CalendarClock className="h-4 w-4" />
+                Change due date
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onSelect={() => onDelete(action.id)}
+                className="text-destructive focus:text-destructive"
+              >
+                <Trash2 className="h-4 w-4" />
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <button
             type="button"
             onClick={() => setEditing((value) => !value)}
@@ -152,15 +206,8 @@ export function ActionListItem({
           >
             <Pencil className="h-4 w-4" />
           </button>
-          <button
-            type="button"
-            onClick={() => onDelete(action.id)}
-            aria-label={`Delete action: ${action.title}`}
-            className="rounded-lg border border-border p-2 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
-          >
-            <Trash2 className="h-4 w-4" />
-          </button>
         </div>
+
       </div>
     </article>
   );
