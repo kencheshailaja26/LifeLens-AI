@@ -25,7 +25,7 @@ export function loadAnalysis(id: string): AnalysisResult | undefined {
   return read()[id];
 }
 
-const clean = (items: { label: string; note?: string | null }[]) =>
+const clean = (items: { label: string; note?: string | null | undefined }[]) =>
   items.map((item) => ({ label: item.label, ...(item.note ? { note: item.note } : {}) }));
 
 export function toAnalysisResult(

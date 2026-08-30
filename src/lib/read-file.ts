@@ -30,7 +30,11 @@ export async function readFileContent(file: File): Promise<ReadFileResult> {
   }
 
   if (extension === "docx") {
-    const mammoth = await import("mammoth/mammoth.browser.js");
+    const mammoth = (await import(
+      /* @vite-ignore */ "mammoth/mammoth.browser.js"
+    )) as unknown as {
+      extractRawText: (input: { arrayBuffer: ArrayBuffer }) => Promise<{ value: string }>;
+    };
     const arrayBuffer = await file.arrayBuffer();
     const { value } = await mammoth.extractRawText({ arrayBuffer });
     if (!value.trim()) throw new Error(`No readable text found in ${file.name}`);
