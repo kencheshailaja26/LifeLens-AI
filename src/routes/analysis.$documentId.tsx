@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import {
   CalendarDays,
@@ -17,7 +18,8 @@ import { ImportantDate } from "@/components/analysis/ImportantDate";
 import { PipelineSteps } from "@/components/analysis/PipelineSteps";
 import { RequirementItem } from "@/components/analysis/RequirementItem";
 import { PageContainer, SectionHeading } from "@/components/layout/PageContainer";
-import { getAnalysis } from "@/data/analysis";
+import { getAnalysis, type AnalysisResult } from "@/data/analysis";
+import { loadAnalysis } from "@/lib/analysis-store";
 
 export const Route = createFileRoute("/analysis/$documentId")({
   head: () => ({
@@ -40,7 +42,11 @@ export const Route = createFileRoute("/analysis/$documentId")({
 
 function AnalysisPage() {
   const { documentId } = Route.useParams();
-  const result = getAnalysis(documentId);
+  const [stored, setStored] = useState<AnalysisResult | undefined>(undefined);
+
+  useEffect(() => setStored(loadAnalysis(documentId)), [documentId]);
+
+  const result = stored ?? getAnalysis(documentId);
 
   return (
     <PageContainer
