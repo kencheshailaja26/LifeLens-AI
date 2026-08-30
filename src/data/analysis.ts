@@ -6,9 +6,11 @@ export type AnalysisResult = {
   documentName: string;
   analyzedAt: string;
   summary: AnalysisSummary;
+  summaryText?: string;
   dates: { label: string; value: string }[];
   requirements: { label: string; note?: string }[];
   contacts: { label: string; note?: string }[];
+  amounts?: { label: string; note?: string }[];
   locations: { label: string; note?: string }[];
   instructions: { label: string; note?: string }[];
   actions: GeneratedActionItem[];
