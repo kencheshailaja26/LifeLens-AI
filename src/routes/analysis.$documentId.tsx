@@ -58,14 +58,20 @@ function AnalysisPage() {
 
         <AIAnalysisSummary summary={result.summary} />
 
+        {result.summaryText ? (
+          <section className="surface-card p-5 sm:p-6">
+            <SectionHeading title="Summary" />
+            <p className="-mt-2 text-sm text-muted-foreground">{result.summaryText}</p>
+          </section>
+        ) : null}
+
         {/* Primary emphasis: what the user needs to do */}
         <section className="surface-card p-5 sm:p-6">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
               <SectionHeading title="Actions LifeLens Found" />
               <p className="-mt-2 text-sm text-muted-foreground">
-                {result.actions.length} things to do from this document. Mock results — AI
-                analysis isn't connected yet.
+                {result.actions.length} things to do from this document.
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
