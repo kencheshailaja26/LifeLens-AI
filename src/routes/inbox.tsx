@@ -37,7 +37,10 @@ const timeNow = () =>
 
 const extOf = (name: string) => name.split(".").pop()?.toLowerCase() ?? "file";
 
-type InboxItem = UploadItem & { analysisId?: string; error?: string };
+type InboxItem = UploadItem & {
+  analysisId?: string | undefined;
+  error?: string | undefined;
+};
 
 function InboxPage() {
   const navigate = useNavigate();
