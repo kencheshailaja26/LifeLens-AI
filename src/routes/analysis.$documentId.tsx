@@ -9,6 +9,7 @@ import {
   MapPin,
   Pencil,
   Users,
+  Wallet,
 } from "lucide-react";
 
 import { AIAnalysisSummary } from "@/components/analysis/AIAnalysisSummary";
@@ -132,6 +133,14 @@ function AnalysisPage() {
                 <RequirementItem key={l.label} label={l.label} note={l.note} />
               ))}
             </ExtractionCard>
+
+            {result.amounts && result.amounts.length > 0 ? (
+              <ExtractionCard title="Amounts" icon={Wallet}>
+                {result.amounts.map((a) => (
+                  <RequirementItem key={a.label} label={a.label} note={a.note} />
+                ))}
+              </ExtractionCard>
+            ) : null}
 
             <ExtractionCard title="Important Instructions" icon={Info}>
               {result.instructions.map((i) => (
