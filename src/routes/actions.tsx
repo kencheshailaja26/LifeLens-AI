@@ -72,14 +72,20 @@ function ActionsPage() {
     [actions, status, category],
   );
 
-  const update = (id: string, patch: Partial<ActionItem>) =>
+  const update = (id: string, patch: Partial<ActionItem>) => {
     setActions((prev) => prev.map((a) => (a.id === id ? { ...a, ...patch } : a)));
+    saveActionState(id, {
+      ...(patch.manualPriority ? { manualPriority: patch.manualPriority } : {}),
+      ...(patch.due ? { due: patch.due } : {}),
+    });
+  };
 
   const toggleComplete = (id: string) =>
     setActions((prev) =>
       prev.map((a) => {
         if (a.id !== id) return a;
         const completed = !a.completed;
+        saveActionState(id, { completed });
         return {
           ...a,
           completed,
@@ -94,6 +100,12 @@ function ActionsPage() {
         };
       }),
     );
+
+  const remove = (id: string) => {
+    saveActionState(id, { deleted: true });
+    setActions((prev) => prev.filter((a) => a.id !== id));
+  };
+
 
   return (
     <PageContainer
