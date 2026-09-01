@@ -126,6 +126,68 @@ export function loadActionItems(): ActionItem[] {
   return items;
 }
 
+// ---- Timeline (real analyzed actions, derived from the same store) ----
+
+import type { TimelineItem } from "@/data/timeline";
+
+/** Parse a human/AI due string into an ISO date. Returns undefined when no valid date exists. */
+export function actionDueToISODate(due: string): string | undefined {
+  const trimmed = due.trim();
+  if (!trimmed || /not specified|completed/i.test(trimmed)) return undefined;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) return trimmed;
+
+  const lower = trimmed.toLowerCase();
+  const now = new Date();
+  const toISO = (d: Date) =>
+    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+
+  if (lower.includes("today")) return toISO(now);
+  if (lower.includes("tomorrow")) {
+    const d = new Date(now);
+    d.setDate(d.getDate() + 1);
+    return toISO(d);
+  }
+  const rel = lower.match(/(?:in\s+)?(\d+)\s*day/);
+  if (rel?.[1]) {
+    const d = new Date(now);
+    d.setDate(d.getDate() + Number.parseInt(rel[1], 10));
+    return toISO(d);
+  }
+
+  let parsed = Date.parse(trimmed);
+  if (Number.isNaN(parsed)) parsed = Date.parse(`${trimmed}, ${now.getFullYear()}`);
+  if (Number.isNaN(parsed)) return undefined;
+  const d = new Date(parsed);
+  // Roll forward a year if the date is far in the past (year was omitted).
+  if (d.getTime() < now.getTime() - 300 * 86_400_000) d.setFullYear(d.getFullYear() + 1);
+  return toISO(d);
+}
+
+/** Timeline entries built purely from real AI-analyzed actions in this session. */
+export function loadTimelineItems(): TimelineItem[] {
+  const items: TimelineItem[] = [];
+  for (const action of loadActionItems()) {
+    const date = actionDueToISODate(action.due);
+    if (!date) continue;
+    items.push({
+      id: action.id,
+      title: action.title,
+      date,
+      category: action.category,
+      priority:
+        action.manualPriority ??
+        (action.signals.importance === "critical"
+          ? "high"
+          : action.signals.importance === "significant"
+            ? "medium"
+            : "low"),
+      source: action.source,
+      completed: action.completed,
+    });
+  }
+  return items.sort((a, b) => a.date.localeCompare(b.date));
+}
+
 const clean = (items: { label: string; note?: string | null | undefined }[]) =>
   items.map((item) => ({ label: item.label, ...(item.note ? { note: item.note } : {}) }));
 
