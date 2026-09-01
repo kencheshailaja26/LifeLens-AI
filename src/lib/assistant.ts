@@ -1,4 +1,5 @@
-import { initialActions, type ActionItem } from "@/data/actions";
+import type { ActionItem } from "@/data/actions";
+import { loadActionItems } from "@/lib/analysis-store";
 import { prioritize } from "@/lib/prioritize";
 
 export type AssistantAnswer = {
@@ -23,7 +24,9 @@ const priorityOf = (a: ActionItem): "high" | "medium" | "low" => prioritize(a.si
 
 const rank = { high: 0, medium: 1, low: 2 } as const;
 
-const open = () => initialActions.filter((a) => !a.completed);
+const allActions = () => loadActionItems();
+
+const open = () => allActions().filter((a) => !a.completed);
 
 const line = (a: ActionItem) =>
   `${a.title} — ${a.due.toLowerCase()}, ${priorityOf(a)} priority (${a.category})`;
@@ -76,7 +79,7 @@ export function answerQuestion(question: string): AssistantAnswer {
 
   // Internship-related
   if (has("internship", "joining", "hr", "offer")) {
-    const items = initialActions.filter(
+    const items = allActions().filter(
       (a) => a.source.toLowerCase().includes("internship") || a.title.toLowerCase().includes("internship"),
     );
     if (!items.length) return { text: NOT_FOUND, sources: [], found: false };
@@ -134,7 +137,7 @@ export function answerQuestion(question: string): AssistantAnswer {
 
   // Free-text keyword match against stored actions and documents
   const words = q.replace(/[^a-z0-9 ]/g, " ").split(/\s+/).filter((w) => w.length > 3);
-  const matches = initialActions.filter((a) =>
+  const matches = allActions().filter((a) =>
     words.some(
       (w) =>
         a.title.toLowerCase().includes(w) ||
