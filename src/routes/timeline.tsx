@@ -11,7 +11,8 @@ import {
   priorityStyles,
 } from "@/components/timeline/TimelineEntry";
 import type { ActionCategory } from "@/data/actions";
-import { timelineItems } from "@/data/timeline";
+import type { TimelineItem } from "@/data/timeline";
+import { loadTimelineItems } from "@/lib/analysis-store";
 
 export const Route = createFileRoute("/timeline")({
   head: () => ({
@@ -36,8 +37,11 @@ export const Route = createFileRoute("/timeline")({
 type Filter = "all" | "week" | "month" | ActionCategory;
 type ViewMode = "timeline" | "calendar";
 
-/** Mock "today" so the demo dataset filters sensibly. */
-const TODAY = "2026-06-02";
+/** Real "today" for relative filters. */
+function todayISO() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
 
 const filters: { value: Filter; label: string }[] = [
   { value: "all", label: "All" },
