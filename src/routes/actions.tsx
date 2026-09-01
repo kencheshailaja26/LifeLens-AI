@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { ListChecks, Sparkles } from "lucide-react";
 
@@ -6,8 +6,10 @@ import { ActionFilters, type CategoryFilter, type StatusFilter } from "@/compone
 import { ActionListItem } from "@/components/actions/ActionListItem";
 import { ActionSummary, type SummaryCounts } from "@/components/actions/ActionSummary";
 import { PageContainer } from "@/components/layout/PageContainer";
-import { initialActions, type ActionItem, type Priority } from "@/data/actions";
+import { type ActionItem, type Priority } from "@/data/actions";
+import { loadActionItems, saveActionState } from "@/lib/analysis-store";
 import { prioritize } from "@/lib/prioritize";
+
 
 export const Route = createFileRoute("/actions")({
   head: () => ({
@@ -33,9 +35,15 @@ export const Route = createFileRoute("/actions")({
 const rank: Record<Priority, number> = { high: 0, medium: 1, low: 2 };
 
 function ActionsPage() {
-  const [actions, setActions] = useState<ActionItem[]>(initialActions);
+  const [actions, setActions] = useState<ActionItem[]>([]);
   const [status, setStatus] = useState<StatusFilter>("all");
   const [category, setCategory] = useState<CategoryFilter>("all");
+
+  // Single source of truth: real analyzed documents in the session store.
+  useEffect(() => {
+    setActions(loadActionItems());
+  }, []);
+
 
   const counts = useMemo<SummaryCounts>(
     () =>
@@ -64,14 +72,20 @@ function ActionsPage() {
     [actions, status, category],
   );
 
-  const update = (id: string, patch: Partial<ActionItem>) =>
+  const update = (id: string, patch: Partial<ActionItem>) => {
     setActions((prev) => prev.map((a) => (a.id === id ? { ...a, ...patch } : a)));
+    saveActionState(id, {
+      ...(patch.manualPriority ? { manualPriority: patch.manualPriority } : {}),
+      ...(patch.due ? { due: patch.due } : {}),
+    });
+  };
 
   const toggleComplete = (id: string) =>
     setActions((prev) =>
       prev.map((a) => {
         if (a.id !== id) return a;
         const completed = !a.completed;
+        saveActionState(id, { completed });
         return {
           ...a,
           completed,
@@ -86,6 +100,12 @@ function ActionsPage() {
         };
       }),
     );
+
+  const remove = (id: string) => {
+    saveActionState(id, { deleted: true });
+    setActions((prev) => prev.filter((a) => a.id !== id));
+  };
+
 
   return (
     <PageContainer
@@ -138,7 +158,7 @@ function ActionsPage() {
                 onToggleComplete={toggleComplete}
                 onPriorityChange={(id, priority) => update(id, { manualPriority: priority })}
                 onDueChange={(id, due) => update(id, { due })}
-                onDelete={(id) => setActions((prev) => prev.filter((a) => a.id !== id))}
+                onDelete={remove}
               />
             ))}
           </div>
