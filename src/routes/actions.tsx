@@ -35,9 +35,15 @@ export const Route = createFileRoute("/actions")({
 const rank: Record<Priority, number> = { high: 0, medium: 1, low: 2 };
 
 function ActionsPage() {
-  const [actions, setActions] = useState<ActionItem[]>(initialActions);
+  const [actions, setActions] = useState<ActionItem[]>([]);
   const [status, setStatus] = useState<StatusFilter>("all");
   const [category, setCategory] = useState<CategoryFilter>("all");
+
+  // Single source of truth: real analyzed documents in the session store.
+  useEffect(() => {
+    setActions(loadActionItems());
+  }, []);
+
 
   const counts = useMemo<SummaryCounts>(
     () =>
