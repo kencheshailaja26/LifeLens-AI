@@ -168,7 +168,7 @@ export function actionDueToISODate(due: string): string | undefined {
 export function loadTimelineItems(): TimelineItem[] {
   const items: TimelineItem[] = [];
   for (const action of loadActionItems()) {
-    const date = actionDueToISODate(action.due);
+    const date = actionDueToISODate(action.rawDue ?? action.due);
     if (!date) continue;
     items.push({
       id: action.id,
