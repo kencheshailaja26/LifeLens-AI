@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { ListChecks, Sparkles } from "lucide-react";
 
@@ -6,8 +6,10 @@ import { ActionFilters, type CategoryFilter, type StatusFilter } from "@/compone
 import { ActionListItem } from "@/components/actions/ActionListItem";
 import { ActionSummary, type SummaryCounts } from "@/components/actions/ActionSummary";
 import { PageContainer } from "@/components/layout/PageContainer";
-import { initialActions, type ActionItem, type Priority } from "@/data/actions";
+import { type ActionItem, type Priority } from "@/data/actions";
+import { loadActionItems, saveActionState } from "@/lib/analysis-store";
 import { prioritize } from "@/lib/prioritize";
+
 
 export const Route = createFileRoute("/actions")({
   head: () => ({
