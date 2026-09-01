@@ -158,7 +158,7 @@ function ActionsPage() {
                 onToggleComplete={toggleComplete}
                 onPriorityChange={(id, priority) => update(id, { manualPriority: priority })}
                 onDueChange={(id, due) => update(id, { due })}
-                onDelete={(id) => setActions((prev) => prev.filter((a) => a.id !== id))}
+                onDelete={remove}
               />
             ))}
           </div>
