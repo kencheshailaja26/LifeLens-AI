@@ -24,6 +24,8 @@ export type ActionItem = {
   category: ActionCategory;
   source: string;
   explanation?: string;
+  /** Original due string when `due` is replaced by a display label (e.g. "Completed"). */
+  rawDue?: string;
   status: ActionStatus;
   completed: boolean;
 };

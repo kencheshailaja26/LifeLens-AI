@@ -11,7 +11,8 @@ import {
   priorityStyles,
 } from "@/components/timeline/TimelineEntry";
 import type { ActionCategory } from "@/data/actions";
-import { timelineItems } from "@/data/timeline";
+import type { TimelineItem } from "@/data/timeline";
+import { loadTimelineItems } from "@/lib/analysis-store";
 
 export const Route = createFileRoute("/timeline")({
   head: () => ({
@@ -36,8 +37,11 @@ export const Route = createFileRoute("/timeline")({
 type Filter = "all" | "week" | "month" | ActionCategory;
 type ViewMode = "timeline" | "calendar";
 
-/** Mock "today" so the demo dataset filters sensibly. */
-const TODAY = "2026-06-02";
+/** Real "today" for relative filters. */
+function todayISO() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
 
 const filters: { value: Filter; label: string }[] = [
   { value: "all", label: "All" },
@@ -59,15 +63,18 @@ function TimelinePage() {
   const [filter, setFilter] = useState<Filter>("all");
   const [view, setView] = useState<ViewMode>("timeline");
 
+  const items = useMemo(() => loadTimelineItems(), []);
+
   const visible = useMemo(() => {
-    const sorted = [...timelineItems].sort((a, b) => a.date.localeCompare(b.date));
+    const today = todayISO();
+    const sorted = [...items].sort((a, b) => a.date.localeCompare(b.date));
     return sorted.filter((item) => {
       if (filter === "all") return true;
-      if (filter === "week") return item.date >= TODAY && item.date <= addDays(TODAY, 7);
-      if (filter === "month") return item.date.slice(0, 7) === TODAY.slice(0, 7);
+      if (filter === "week") return item.date >= today && item.date <= addDays(today, 7);
+      if (filter === "month") return item.date.slice(0, 7) === today.slice(0, 7);
       return item.category === filter;
     });
-  }, [filter]);
+  }, [items, filter]);
 
   const groups = useMemo(() => {
     const map = new Map<string, typeof visible>();
@@ -171,8 +178,9 @@ function TimelinePage() {
   );
 }
 
-function CalendarView({ items }: { items: typeof timelineItems }) {
-  const month = "2026-06";
+function CalendarView({ items }: { items: TimelineItem[] }) {
+  // Show the month of the earliest item, falling back to the current month.
+  const month = (items[0]?.date ?? todayISO()).slice(0, 7);
   const monthLabel = new Date(`${month}-01T00:00:00`).toLocaleDateString("en-US", {
     month: "long",
     year: "numeric",
@@ -209,7 +217,7 @@ function CalendarView({ items }: { items: typeof timelineItems }) {
         {cells.map((iso, i) => {
           if (!iso) return <div key={`empty-${i}`} />;
           const dayItems = byDate.get(iso) ?? [];
-          const isToday = iso === TODAY;
+          const isToday = iso === todayISO();
           return (
             <div
               key={iso}
