@@ -65,7 +65,7 @@ function dueInDaysFrom(due: string): number {
   if (lower.includes("today")) return 0;
   if (lower.includes("tomorrow")) return 1;
   const rel = lower.match(/(\d+)\s*day/);
-  if (rel) return Number.parseInt(rel[1], 10);
+  if (rel?.[1]) return Number.parseInt(rel[1], 10);
   const parsed = Date.parse(`${due}, ${new Date().getFullYear()}`);
   if (!Number.isNaN(parsed)) {
     const diff = Math.round((parsed - Date.now()) / 86_400_000);
@@ -107,7 +107,7 @@ export function loadActionItems(): ActionItem[] {
         description: action.explanation,
         due: completed ? "Completed" : due,
         signals,
-        manualPriority: state?.manualPriority,
+        ...(state?.manualPriority ? { manualPriority: state.manualPriority } : {}),
         category,
         source: action.source ?? analysis.documentName,
         explanation: action.explanation,
