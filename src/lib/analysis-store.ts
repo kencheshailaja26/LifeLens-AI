@@ -106,6 +106,7 @@ export function loadActionItems(): ActionItem[] {
         title: action.title,
         description: action.explanation,
         due: completed ? "Completed" : due,
+        ...(completed ? { rawDue: due } : {}),
         signals,
         ...(state?.manualPriority ? { manualPriority: state.manualPriority } : {}),
         category,
