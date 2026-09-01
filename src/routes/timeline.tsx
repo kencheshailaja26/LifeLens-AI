@@ -63,15 +63,18 @@ function TimelinePage() {
   const [filter, setFilter] = useState<Filter>("all");
   const [view, setView] = useState<ViewMode>("timeline");
 
+  const items = useMemo(() => loadTimelineItems(), []);
+
   const visible = useMemo(() => {
-    const sorted = [...timelineItems].sort((a, b) => a.date.localeCompare(b.date));
+    const today = todayISO();
+    const sorted = [...items].sort((a, b) => a.date.localeCompare(b.date));
     return sorted.filter((item) => {
       if (filter === "all") return true;
-      if (filter === "week") return item.date >= TODAY && item.date <= addDays(TODAY, 7);
-      if (filter === "month") return item.date.slice(0, 7) === TODAY.slice(0, 7);
+      if (filter === "week") return item.date >= today && item.date <= addDays(today, 7);
+      if (filter === "month") return item.date.slice(0, 7) === today.slice(0, 7);
       return item.category === filter;
     });
-  }, [filter]);
+  }, [items, filter]);
 
   const groups = useMemo(() => {
     const map = new Map<string, typeof visible>();
