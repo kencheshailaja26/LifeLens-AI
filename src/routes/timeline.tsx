@@ -178,8 +178,9 @@ function TimelinePage() {
   );
 }
 
-function CalendarView({ items }: { items: typeof timelineItems }) {
-  const month = "2026-06";
+function CalendarView({ items }: { items: TimelineItem[] }) {
+  // Show the month of the earliest item, falling back to the current month.
+  const month = (items[0]?.date ?? todayISO()).slice(0, 7);
   const monthLabel = new Date(`${month}-01T00:00:00`).toLocaleDateString("en-US", {
     month: "long",
     year: "numeric",
@@ -216,7 +217,7 @@ function CalendarView({ items }: { items: typeof timelineItems }) {
         {cells.map((iso, i) => {
           if (!iso) return <div key={`empty-${i}`} />;
           const dayItems = byDate.get(iso) ?? [];
-          const isToday = iso === TODAY;
+          const isToday = iso === todayISO();
           return (
             <div
               key={iso}
