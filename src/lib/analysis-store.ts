@@ -192,6 +192,69 @@ export function loadTimelineItems(): TimelineItem[] {
 const clean = (items: { label: string; note?: string | null | undefined }[]) =>
   items.map((item) => ({ label: item.label, ...(item.note ? { note: item.note } : {}) }));
 
+// ---- Smart Reminders (derived from the same persisted action store) ----
+
+export type ReminderUrgency = "urgent" | "reminder" | "upcoming";
+
+export type Reminder = {
+  id: string;
+  title: string;
+  dueDate: string; // ISO
+  dueLabel: string; // original due text from the document
+  urgency: ReminderUrgency;
+  daysUntil: number;
+  category: ActionCategory;
+  priority: Priority;
+  source: string;
+};
+
+function daysUntilISODate(iso: string): number {
+  const now = new Date();
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const target = new Date(`${iso}T00:00:00`);
+  return Math.round((target.getTime() - startOfToday.getTime()) / 86_400_000);
+}
+
+/**
+ * Build reminders purely from real, non-completed actions that have a valid
+ * due date extracted from an analyzed document. No dates are invented.
+ */
+export function loadReminders(): Reminder[] {
+  const reminders: Reminder[] = [];
+
+  for (const action of loadActionItems()) {
+    if (action.completed) continue;
+    const iso = actionDueToISODate(action.due);
+    if (!iso) continue; // no valid date → no reminder
+
+    const days = daysUntilISODate(iso);
+    if (days < 0) continue; // already past — not a pending reminder
+
+    const urgency: ReminderUrgency =
+      days === 0 ? "urgent" : days === 1 ? "reminder" : "upcoming";
+
+    reminders.push({
+      id: action.id,
+      title: action.title,
+      dueDate: iso,
+      dueLabel: action.due,
+      urgency,
+      daysUntil: days,
+      category: action.category,
+      priority:
+        action.manualPriority ??
+        (action.signals.importance === "critical"
+          ? "high"
+          : action.signals.importance === "significant"
+            ? "medium"
+            : "low"),
+      source: action.source,
+    });
+  }
+
+  return reminders.sort((a, b) => a.dueDate.localeCompare(b.dueDate));
+}
+
 export function toAnalysisResult(
   id: string,
   documentName: string,
