@@ -147,9 +147,17 @@ export function answerQuestion(question: string): AssistantAnswer {
   const topicWords = keywords(q);
   const matchesTopic = (text: string) => {
     if (!topicWords.length) return true;
-    const lower = text.toLowerCase();
-    return topicWords.some((w) => lower.includes(w));
+    const tokens = text
+      .toLowerCase()
+      .replace(/[^a-z0-9 ]/g, " ")
+      .split(/\s+/)
+      .filter(Boolean)
+      .map(stem);
+    return topicWords.some((w) =>
+      tokens.some((t) => t === w || (w.length > 3 && (t.includes(w) || w.includes(t)))),
+    );
   };
+
 
   // Overdue
   if (has("overdue", "late", "missed")) {
