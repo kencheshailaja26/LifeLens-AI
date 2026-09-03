@@ -361,7 +361,7 @@ export function loadInsights(): Insight[] {
   // Important dates extracted from documents (e.g. joining dates)
   for (const analysis of analyses) {
     for (const date of analysis.dates) {
-      const iso = date.note ? actionDueToISODate(date.note) : undefined;
+      const iso = date.value ? actionDueToISODate(date.value) : undefined;
       if (!iso) continue;
       const days = daysUntilISODate(iso);
       if (days < 0) continue;
