@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   AlarmClock,
+  BellRing,
   CalendarClock,
   CheckCircle2,
   FileText,
@@ -13,6 +14,16 @@ import { DocumentCard } from "@/components/cards/DocumentCard";
 import { StatCard } from "@/components/cards/StatCard";
 import { PageContainer, SectionHeading } from "@/components/layout/PageContainer";
 import { sampleActions, sampleDocuments } from "@/data/sample";
+import { loadInsights, loadReminders, type InsightTone } from "@/lib/analysis-store";
+import { formatLongDate } from "@/components/timeline/TimelineEntry";
+import { cn } from "@/lib/utils";
+
+const insightToneStyles: Record<InsightTone, string> = {
+  urgent: "bg-destructive/10 text-destructive",
+  warning: "bg-warning/20 text-warning-foreground",
+  info: "bg-primary/10 text-primary",
+  success: "bg-success/10 text-success",
+};
 
 export const Route = createFileRoute("/")({
   head: () => ({
