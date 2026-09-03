@@ -255,6 +255,128 @@ export function loadReminders(): Reminder[] {
   return reminders.sort((a, b) => a.dueDate.localeCompare(b.dueDate));
 }
 
+// ---- Smart Insights (derived from the same persisted store) ----
+
+export type InsightTone = "urgent" | "warning" | "info" | "success";
+
+export type Insight = {
+  id: string;
+  text: string;
+  detail?: string;
+  tone: InsightTone;
+};
+
+function effectivePriority(action: ActionItem): Priority {
+  return (
+    action.manualPriority ??
+    (action.signals.importance === "critical"
+      ? "high"
+      : action.signals.importance === "significant"
+        ? "medium"
+        : "low")
+  );
+}
+
+/**
+ * Build concise, actionable insights purely from real analyzed documents and
+ * their persisted actions. Nothing is invented: every insight cites data that
+ * exists in the store. Returns an empty array when there is no real data.
+ */
+export function loadInsights(): Insight[] {
+  const insights: Insight[] = [];
+  const analyses = loadAllAnalyses();
+  const actions = loadActionItems();
+  const pending = actions.filter((a) => !a.completed);
+  if (analyses.length === 0 && pending.length === 0) return insights;
+
+  const fmt = (iso: string) =>
+    new Date(`${iso}T00:00:00`).toLocaleDateString([], { dateStyle: "long" });
+
+  const dated = pending
+    .map((a) => ({ action: a, iso: actionDueToISODate(a.due) }))
+    .filter((x): x is { action: ActionItem; iso: string } => Boolean(x.iso))
+    .map((x) => ({ ...x, days: daysUntilISODate(x.iso) }))
+    .sort((a, b) => a.days - b.days);
+
+  // Overdue actions
+  const overdue = dated.filter((x) => x.days < 0);
+  for (const { action, iso, days } of overdue) {
+    insights.push({
+      id: `overdue-${action.id}`,
+      text: `${action.title} is overdue`,
+      detail: `Was due ${fmt(iso)} (${-days} ${days === -1 ? "day" : "days"} ago) · ${action.source}`,
+      tone: "urgent",
+    });
+  }
+
+  // Due today / tomorrow
+  for (const { action, iso, days } of dated.filter((x) => x.days >= 0 && x.days <= 1)) {
+    insights.push({
+      id: `soon-${action.id}`,
+      text: `${action.title} by ${fmt(iso)}`,
+      detail: `${days === 0 ? "Due today" : "Due tomorrow"} · ${action.source}`,
+      tone: days === 0 ? "urgent" : "warning",
+    });
+  }
+
+  // Due within the next week
+  const thisWeek = dated.filter((x) => x.days > 1 && x.days <= 7);
+  for (const { action, iso, days } of thisWeek) {
+    insights.push({
+      id: `week-${action.id}`,
+      text: `${action.title} by ${fmt(iso)}`,
+      detail: `Due in ${days} days · ${action.source}`,
+      tone: "info",
+    });
+  }
+
+  // Highest-priority pending action
+  const rank: Record<Priority, number> = { high: 0, medium: 1, low: 2 };
+  const top = [...pending].sort((a, b) => {
+    const r = rank[effectivePriority(a)] - rank[effectivePriority(b)];
+    return r !== 0 ? r : a.signals.dueInDays - b.signals.dueInDays;
+  })[0];
+  if (top) {
+    insights.push({
+      id: `top-${top.id}`,
+      text: `Your next priority: ${top.title}`,
+      detail: top.explanation || top.source,
+      tone: effectivePriority(top) === "high" ? "urgent" : "info",
+    });
+  }
+
+  // Documents requiring attention (have overdue or due-soon actions)
+  const attentionSources = new Set(
+    dated.filter((x) => x.days <= 1).map((x) => x.action.source),
+  );
+  for (const source of attentionSources) {
+    insights.push({
+      id: `doc-${source}`,
+      text: `${source} needs your attention`,
+      detail: "It contains actions that are due soon or overdue.",
+      tone: "warning",
+    });
+  }
+
+  // Important dates extracted from documents (e.g. joining dates)
+  for (const analysis of analyses) {
+    for (const date of analysis.dates) {
+      const iso = date.value ? actionDueToISODate(date.value) : undefined;
+      if (!iso) continue;
+      const days = daysUntilISODate(iso);
+      if (days < 0) continue;
+      insights.push({
+        id: `date-${analysis.id}-${date.label}`,
+        text: `${date.label}: ${fmt(iso)}`,
+        detail: `${analysis.documentName}${days > 7 ? ` · in ${days} days` : ""}`,
+        tone: "info",
+      });
+    }
+  }
+
+  return insights;
+}
+
 export function toAnalysisResult(
   id: string,
   documentName: string,
