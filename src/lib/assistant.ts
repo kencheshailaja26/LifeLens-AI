@@ -85,12 +85,14 @@ const STOP_WORDS = new Set([
   "dates",
 ]);
 
+const stem = (w: string) => w.replace(/(ies)$/, "y").replace(/(es|s)$/, "");
+
 const keywords = (q: string) =>
   q
     .replace(/[^a-z0-9 ]/g, " ")
     .split(/\s+/)
-    .filter((w) => w.length > 3 && !STOP_WORDS.has(w))
-    .map((w) => w.replace(/(ies)$/, "y").replace(/s$/, ""));
+    .filter((w) => w.length > 2 && !STOP_WORDS.has(w))
+    .map(stem);
 
 /** Flatten every stored analysis into searchable, grounded facts. */
 type Fact = { section: string; label: string; note?: string; source: string };
@@ -145,9 +147,17 @@ export function answerQuestion(question: string): AssistantAnswer {
   const topicWords = keywords(q);
   const matchesTopic = (text: string) => {
     if (!topicWords.length) return true;
-    const lower = text.toLowerCase();
-    return topicWords.some((w) => lower.includes(w));
+    const tokens = text
+      .toLowerCase()
+      .replace(/[^a-z0-9 ]/g, " ")
+      .split(/\s+/)
+      .filter(Boolean)
+      .map(stem);
+    return topicWords.some((w) =>
+      tokens.some((t) => t === w || (w.length > 3 && (t.includes(w) || w.includes(t)))),
+    );
   };
+
 
   // Overdue
   if (has("overdue", "late", "missed")) {
@@ -326,6 +336,23 @@ export function answerQuestion(question: string): AssistantAnswer {
       bullets,
       sources: uniqueSources([...matchedActions, ...matchedFacts]),
       found: true,
+    };
+  }
+
+  // Nothing matched the question, but real data exists: state the fallback and
+  // show what LifeLens actually holds (still fully grounded, nothing invented).
+  const analyses = allAnalyses();
+  const openActions = sortByUrgency(open());
+  const bullets = [
+    ...analyses.map((a) => `${a.documentName} (${a.summary.documentType})`),
+    ...openActions.map(line),
+  ];
+  if (bullets.length) {
+    return {
+      text: NOT_FOUND,
+      bullets,
+      sources: uniqueSources([...analyses.map((a) => ({ source: a.documentName })), ...openActions]),
+      found: false,
     };
   }
 
