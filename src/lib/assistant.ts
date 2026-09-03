@@ -85,12 +85,14 @@ const STOP_WORDS = new Set([
   "dates",
 ]);
 
+const stem = (w: string) => w.replace(/(ies)$/, "y").replace(/(es|s)$/, "");
+
 const keywords = (q: string) =>
   q
     .replace(/[^a-z0-9 ]/g, " ")
     .split(/\s+/)
-    .filter((w) => w.length > 3 && !STOP_WORDS.has(w))
-    .map((w) => w.replace(/(ies)$/, "y").replace(/s$/, ""));
+    .filter((w) => w.length > 2 && !STOP_WORDS.has(w))
+    .map(stem);
 
 /** Flatten every stored analysis into searchable, grounded facts. */
 type Fact = { section: string; label: string; note?: string; source: string };
