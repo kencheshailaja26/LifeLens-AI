@@ -46,6 +46,8 @@ export const Route = createFileRoute("/")({
 });
 
 function Dashboard() {
+  const insights = loadInsights();
+  const reminders = loadReminders().slice(0, 5);
   return (
     <PageContainer
       title={<>Good morning 👋</>}
