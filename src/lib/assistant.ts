@@ -339,5 +339,22 @@ export function answerQuestion(question: string): AssistantAnswer {
     };
   }
 
+  // Nothing matched the question, but real data exists: state the fallback and
+  // show what LifeLens actually holds (still fully grounded, nothing invented).
+  const analyses = allAnalyses();
+  const openActions = sortByUrgency(open());
+  const bullets = [
+    ...analyses.map((a) => `${a.documentName} (${a.summary.documentType})`),
+    ...openActions.map(line),
+  ];
+  if (bullets.length) {
+    return {
+      text: NOT_FOUND,
+      bullets,
+      sources: uniqueSources([...analyses.map((a) => ({ source: a.documentName })), ...openActions]),
+      found: false,
+    };
+  }
+
   return { text: NOT_FOUND, sources: [], found: false };
 }
