@@ -118,31 +118,66 @@ function Dashboard() {
               </span>
               <h2 className="text-base font-semibold tracking-tight">AI Insights</h2>
             </div>
-            <div className="mt-4 rounded-xl border border-dashed border-border bg-muted/40 p-5 text-sm text-muted-foreground">
-              Your AI insights will appear here after LifeLens analyzes your information.
-            </div>
-            <button className="mt-4 inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-border text-sm font-semibold transition-colors hover:bg-muted">
+            {insights.length === 0 ? (
+              <div className="mt-4 rounded-xl border border-dashed border-border bg-muted/40 p-5 text-sm text-muted-foreground">
+                Your AI insights will appear here after LifeLens analyzes your information.
+              </div>
+            ) : (
+              <div className="mt-4 space-y-3">
+                {insights.map((insight: Insight) => {
+                  const Icon = insightIcons[insight.tone];
+                  return (
+                    <Link
+                      key={insight.id}
+                      to="/actions"
+                      className="flex items-start gap-3 rounded-xl border border-border bg-muted/40 p-3 transition-colors hover:border-primary/40 hover:bg-muted/60"
+                    >
+                      <span
+                        className={cn(
+                          "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl",
+                          insightToneStyles[insight.tone],
+                        )}
+                      >
+                        <Icon className="h-[18px] w-[18px]" />
+                      </span>
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold">{insight.text}</p>
+                        {insight.detail ? (
+                          <p className="mt-0.5 text-xs text-muted-foreground">{insight.detail}</p>
+                        ) : null}
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
+            <Link
+              to="/assistant"
+              className="mt-4 inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-border text-sm font-semibold transition-colors hover:bg-muted"
+            >
               <Sparkles className="h-4 w-4 text-ai" />
               Ask LifeLens
-            </button>
+            </Link>
           </section>
 
           <section className="surface-card p-5">
             <h2 className="text-base font-semibold tracking-tight">Deadline radar</h2>
-            <ul className="mt-4 space-y-4">
-              {[
-                { label: "Internship documents", when: "Today" },
-                { label: "Electricity bill", when: "Tomorrow" },
-                { label: "Flight web check-in", when: "In 2 days" },
-              ].map((item) => (
-                <li key={item.label} className="flex items-center justify-between gap-3 text-sm">
-                  <span className="truncate">{item.label}</span>
-                  <span className="shrink-0 rounded-full bg-muted px-2.5 py-1 text-xs text-muted-foreground">
-                    {item.when}
-                  </span>
-                </li>
-              ))}
-            </ul>
+            {reminders.length === 0 ? (
+              <div className="mt-4 rounded-xl border border-dashed border-border bg-muted/40 p-5 text-center text-sm text-muted-foreground">
+                No upcoming deadlines.
+              </div>
+            ) : (
+              <ul className="mt-4 space-y-4">
+                {reminders.map((reminder) => (
+                  <li key={reminder.id} className="flex items-center justify-between gap-3 text-sm">
+                    <span className="truncate">{reminder.title}</span>
+                    <span className="shrink-0 rounded-full bg-muted px-2.5 py-1 text-xs text-muted-foreground">
+                      {formatLongDate(reminder.dueDate)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
           </section>
         </aside>
       </div>
