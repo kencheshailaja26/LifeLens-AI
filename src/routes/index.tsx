@@ -1,10 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   AlarmClock,
+  AlertTriangle,
   BellRing,
   CalendarClock,
   CheckCircle2,
   FileText,
+  Info,
   Sparkles,
   Upload,
 } from "lucide-react";
@@ -14,9 +16,16 @@ import { DocumentCard } from "@/components/cards/DocumentCard";
 import { StatCard } from "@/components/cards/StatCard";
 import { PageContainer, SectionHeading } from "@/components/layout/PageContainer";
 import { sampleActions, sampleDocuments } from "@/data/sample";
-import { loadInsights, loadReminders, type InsightTone } from "@/lib/analysis-store";
+import { loadInsights, loadReminders, type Insight, type InsightTone } from "@/lib/analysis-store";
 import { formatLongDate } from "@/components/timeline/TimelineEntry";
 import { cn } from "@/lib/utils";
+
+const insightIcons: Record<InsightTone, React.ElementType> = {
+  urgent: AlarmClock,
+  warning: AlertTriangle,
+  info: Info,
+  success: CheckCircle2,
+};
 
 const insightToneStyles: Record<InsightTone, string> = {
   urgent: "bg-destructive/10 text-destructive",
