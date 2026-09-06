@@ -1,8 +1,8 @@
+import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   AlarmClock,
   AlertTriangle,
-  BellRing,
   CalendarClock,
   CheckCircle2,
   FileText,
@@ -11,12 +11,19 @@ import {
   Upload,
 } from "lucide-react";
 
-import { ActionCard } from "@/components/cards/ActionCard";
-import { DocumentCard } from "@/components/cards/DocumentCard";
+import { ActionCard, type Action } from "@/components/cards/ActionCard";
+import { DocumentCard, type DocumentItem } from "@/components/cards/DocumentCard";
 import { StatCard } from "@/components/cards/StatCard";
 import { PageContainer, SectionHeading } from "@/components/layout/PageContainer";
-import { sampleActions, sampleDocuments } from "@/data/sample";
-import { loadInsights, loadReminders, type Insight, type InsightTone } from "@/lib/analysis-store";
+import {
+  loadActionItems,
+  loadDocumentItems,
+  loadInsights,
+  loadReminders,
+  type Insight,
+  type InsightTone,
+  type Reminder,
+} from "@/lib/analysis-store";
 import { formatLongDate } from "@/components/timeline/TimelineEntry";
 import { cn } from "@/lib/utils";
 
