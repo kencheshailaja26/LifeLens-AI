@@ -19,8 +19,9 @@ import { ImportantDate } from "@/components/analysis/ImportantDate";
 import { PipelineSteps } from "@/components/analysis/PipelineSteps";
 import { RequirementItem } from "@/components/analysis/RequirementItem";
 import { PageContainer, SectionHeading } from "@/components/layout/PageContainer";
-import { getAnalysis, type AnalysisResult } from "@/data/analysis";
+import { type AnalysisResult } from "@/data/analysis";
 import { loadAnalysis } from "@/lib/analysis-store";
+import { Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/analysis/$documentId")({
   head: () => ({
@@ -43,17 +44,54 @@ export const Route = createFileRoute("/analysis/$documentId")({
 
 function AnalysisPage() {
   const { documentId } = Route.useParams();
-  const [stored, setStored] = useState<AnalysisResult | undefined>(undefined);
+  const [result, setResult] = useState<AnalysisResult | undefined>(undefined);
+  const [loaded, setLoaded] = useState(false);
 
-  useEffect(() => setStored(loadAnalysis(documentId)), [documentId]);
+  useEffect(() => {
+    setResult(loadAnalysis(documentId));
+    setLoaded(true);
+  }, [documentId]);
 
-  const result = stored ?? getAnalysis(documentId);
+  if (!result) {
+    return (
+      <PageContainer title="AI Analysis" subtitle="Document analysis">
+        <div className="rounded-2xl border border-dashed border-border bg-muted/40 p-10 text-center">
+          <p className="text-sm font-semibold">
+            {loaded ? "Document not found" : "Loading…"}
+          </p>
+          {loaded ? (
+            <>
+              <p className="mt-1 text-sm text-muted-foreground">
+                We don't have an analysis for this document. Add it in the Inbox and analyze it
+                to see the results here.
+              </p>
+              <div className="mt-4 flex flex-wrap justify-center gap-2">
+                <Link
+                  to="/inbox"
+                  className="inline-flex h-10 items-center justify-center rounded-xl bg-primary px-5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+                >
+                  Go to Inbox
+                </Link>
+                <Link
+                  to="/documents"
+                  className="inline-flex h-10 items-center justify-center rounded-xl border border-border px-5 text-sm font-semibold transition-colors hover:bg-muted"
+                >
+                  View documents
+                </Link>
+              </div>
+            </>
+          ) : null}
+        </div>
+      </PageContainer>
+    );
+  }
 
   return (
     <PageContainer
       title="AI Analysis"
       subtitle={`${result.documentName} · ${result.analyzedAt}`}
     >
+
       <div className="space-y-6">
         <PipelineSteps />
 
