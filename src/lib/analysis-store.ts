@@ -411,3 +411,31 @@ export function toAnalysisResult(
     })),
   };
 }
+
+// ---- Documents (derived from the same persisted analyses) ----
+
+import type { DocumentItem, DocumentKind } from "@/components/cards/DocumentCard";
+
+function documentKind(analysis: AnalysisResult): DocumentKind {
+  const name = analysis.documentName.toLowerCase();
+  const type = `${analysis.summary.documentType} ${analysis.summary.category}`.toLowerCase();
+  if (/\.(png|jpe?g|gif|webp|heic)$/.test(name)) return "image";
+  if (/bill|invoice|payment|electricity|receipt/.test(type)) return "bill";
+  if (/travel|flight|ticket|train|visa|passport/.test(type)) return "travel";
+  return "pdf";
+}
+
+/** Real analyzed documents from the session store. Empty on a fresh session. */
+export function loadDocumentItems(): DocumentItem[] {
+  const states = readStates();
+  return loadAllAnalyses().map((analysis) => {
+    const count = analysis.actions.filter((a) => !states[a.id]?.deleted).length;
+    return {
+      id: analysis.id,
+      name: analysis.documentName,
+      kind: documentKind(analysis),
+      meta: `${analysis.analyzedAt.replace(/^Analyzed /, "")} · ${count} ${count === 1 ? "action" : "actions"}`,
+      status: "Analyzed",
+    };
+  });
+}
