@@ -1,8 +1,8 @@
+import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   AlarmClock,
   AlertTriangle,
-  BellRing,
   CalendarClock,
   CheckCircle2,
   FileText,
@@ -11,12 +11,19 @@ import {
   Upload,
 } from "lucide-react";
 
-import { ActionCard } from "@/components/cards/ActionCard";
-import { DocumentCard } from "@/components/cards/DocumentCard";
+import { ActionCard, type Action } from "@/components/cards/ActionCard";
+import { DocumentCard, type DocumentItem } from "@/components/cards/DocumentCard";
 import { StatCard } from "@/components/cards/StatCard";
 import { PageContainer, SectionHeading } from "@/components/layout/PageContainer";
-import { sampleActions, sampleDocuments } from "@/data/sample";
-import { loadInsights, loadReminders, type Insight, type InsightTone } from "@/lib/analysis-store";
+import {
+  loadActionItems,
+  loadDocumentItems,
+  loadInsights,
+  loadReminders,
+  type Insight,
+  type InsightTone,
+  type Reminder,
+} from "@/lib/analysis-store";
 import { formatLongDate } from "@/components/timeline/TimelineEntry";
 import { cn } from "@/lib/utils";
 
@@ -55,24 +62,88 @@ export const Route = createFileRoute("/")({
 });
 
 function Dashboard() {
-  const insights = loadInsights();
-  const reminders = loadReminders().slice(0, 5);
+  const [insights, setInsights] = useState<Insight[]>([]);
+  const [reminders, setReminders] = useState<Reminder[]>([]);
+  const [actions, setActions] = useState<Action[]>([]);
+  const [documents, setDocuments] = useState<DocumentItem[]>([]);
+  const [counts, setCounts] = useState({ urgent: 0, upcoming: 0, completed: 0, documents: 0 });
+
+  useEffect(() => {
+    const items = loadActionItems();
+    const docs = loadDocumentItems();
+    setInsights(loadInsights());
+    setReminders(loadReminders().slice(0, 5));
+    setDocuments(docs);
+    setCounts({
+      urgent: items.filter((i) => !i.completed && (i.status === "urgent" || i.status === "overdue"))
+        .length,
+      upcoming: items.filter(
+        (i) => !i.completed && i.signals.dueInDays > 1 && i.signals.dueInDays <= 7,
+      ).length,
+      completed: items.filter((i) => i.completed).length,
+      documents: docs.length,
+    });
+    setActions(
+      items.slice(0, 5).map((item) => ({
+        id: item.id,
+        title: item.title,
+        description: item.description,
+        due: item.due,
+        source: item.source,
+        priority:
+          item.status === "urgent" || item.status === "overdue"
+            ? "urgent"
+            : item.signals.dueInDays <= 7
+              ? "soon"
+              : "later",
+        done: item.completed,
+      })),
+    );
+  }, []);
+
   return (
     <PageContainer
       title={<>Good morning 👋</>}
       subtitle="Here's what needs your attention today."
       actions={
-        <button className="inline-flex h-11 items-center gap-2 rounded-xl bg-primary px-5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90">
+        <Link
+          to="/inbox"
+          className="inline-flex h-11 items-center gap-2 rounded-xl bg-primary px-5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+        >
           <Upload className="h-4 w-4" />
           Upload information
-        </button>
+        </Link>
       }
     >
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard label="Urgent" value={2} hint="Due within 24 hours" icon={AlarmClock} tone="urgent" />
-        <StatCard label="Upcoming" value={5} hint="Next 7 days" icon={CalendarClock} tone="upcoming" />
-        <StatCard label="Completed" value={12} hint="This month" icon={CheckCircle2} tone="completed" />
-        <StatCard label="Documents" value={8} hint="4 analyzed" icon={FileText} tone="neutral" />
+        <StatCard
+          label="Urgent"
+          value={counts.urgent}
+          hint="Due within 24 hours"
+          icon={AlarmClock}
+          tone="urgent"
+        />
+        <StatCard
+          label="Upcoming"
+          value={counts.upcoming}
+          hint="Next 7 days"
+          icon={CalendarClock}
+          tone="upcoming"
+        />
+        <StatCard
+          label="Completed"
+          value={counts.completed}
+          hint="Marked done"
+          icon={CheckCircle2}
+          tone="completed"
+        />
+        <StatCard
+          label="Documents"
+          value={counts.documents}
+          hint="Analyzed"
+          icon={FileText}
+          tone="neutral"
+        />
       </div>
 
       <div className="mt-8 grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
@@ -86,11 +157,18 @@ function Dashboard() {
                 </Link>
               }
             />
-            <div className="space-y-3">
-              {sampleActions.map((action) => (
-                <ActionCard key={action.id} action={action} />
-              ))}
-            </div>
+            {actions.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-border bg-muted/40 p-8 text-center text-sm text-muted-foreground">
+                No actions yet. Add something in the Inbox and LifeLens will find what you need to
+                do.
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {actions.map((action) => (
+                  <ActionCard key={action.id} action={action} />
+                ))}
+              </div>
+            )}
           </section>
 
           <section>
@@ -102,12 +180,21 @@ function Dashboard() {
                 </Link>
               }
             />
-            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-              {sampleDocuments.map((doc) => (
-                <DocumentCard key={doc.id} document={doc} />
-              ))}
-            </div>
+            {documents.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-border bg-muted/40 p-8 text-center text-sm text-muted-foreground">
+                No documents yet.
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                {documents.map((doc) => (
+                  <Link key={doc.id} to="/analysis/$documentId" params={{ documentId: doc.id }}>
+                    <DocumentCard document={doc} />
+                  </Link>
+                ))}
+              </div>
+            )}
           </section>
+
         </div>
 
         <aside className="space-y-4">
