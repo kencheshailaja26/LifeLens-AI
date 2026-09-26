@@ -1,129 +1,161 @@
-# LifeLens Dashboard
+# LifeLens AI
 
-Build the initial application foundation for a web app called "LifeLens AI".
-Product:
-LifeLens AI
-Tagline: "Turn information into action."
-Core product concept:
-LifeLens AI is an AI-powered personal action assistant. Users upload or paste information such as PDFs, screenshots, bills, internship documents, job offers, travel documents, application forms, emails, and notes. The system understands the information, extracts important details, converts them into actionable tasks, prioritizes those tasks, and helps users stay on top of deadlines.
-IMPORTANT:
-For this step, ONLY build the application foundation and visual structure. Do not implement AI document analysis yet.
-TECH STACK:
-- Use React + TypeScript.
-- Use Tailwind CSS.
-- Use reusable components.
-- Use Lucide React icons or the existing icon library.
-- Keep the code clean and component-based.
-- Make the application fully responsive.
-DESIGN STYLE:
-Create a modern, premium AI productivity application.
-Visual direction:
-- Clean
-- Minimal
-- Professional
-- Friendly
-- Modern SaaS dashboard
-- Lots of whitespace
-- Rounded cards
-- Subtle shadows
-- Soft backgrounds
-- Blue/purple AI-inspired accent colors
-PRIMARY COLOR:
-Use a modern blue as the primary action color.
-GENERAL LAYOUT:
-Desktop:
-- Fixed left sidebar
-- Main content area on the right
-- Top header inside the main content
-- Responsive mobile navigation
-SIDEBAR:
-At the top:
-- LifeLens AI logo/icon
-- Text: LifeLens AI
-Navigation items:
-1. Dashboard
-2. Inbox
-3. Actions
-4. Timeline
-5. AI Assistant
-Below the navigation, add a secondary section:
-Management:
-- Documents
-- Reminders
-At the bottom:
-- Settings
-- User profile section
-Each navigation item should have an appropriate icon.
-TOP HEADER:
-Create a clean top header containing:
-- Search field
-- Notification icon
-- User avatar/profile
-- Optional small greeting
-DASHBOARD ROUTE:
-Create:
-/
-or
-/dashboard
-The dashboard should initially contain placeholder sections only.
-Dashboard header:
-"Good morning 👋"
-Subtitle:
-"Here’s what needs your attention today."
-Create placeholder statistic cards:
+> Turn information into action.
+
+LifeLens AI is an AI-powered personal action assistant that transforms unstructured information into clear, actionable tasks.
+
+It analyzes documents and other user-provided information, extracts important dates, deadlines, requirements, contacts, instructions, and tasks, and organizes them into a centralized action system.
+
+## Overview
+
+People receive important information through PDFs, internship letters, job offers, bills, application forms, travel documents, screenshots, notes, and other sources. The important actions hidden inside this information can easily be missed.
+
+LifeLens AI helps solve this problem by turning information into structured actions and reminders.
+
+## Core Workflow
+
+Upload or paste information → AI analyzes it → Important details are extracted → Actions are created → Deadlines are tracked → Reminders and insights are generated
+
+## Features
+
+### AI-Powered Document Analysis
+
+LifeLens AI analyzes uploaded information and extracts:
+
+- Document type
+- Summary
+- Important dates
+- Deadlines
+- Tasks
+- Required documents
+- Contact information
+- Amounts
+- Locations
+- Instructions
+- Action items
+
+The analysis is designed to stay grounded in the provided information and avoid inventing details.
+
+### Action Center
+
+Extracted action items are organized into a centralized Action Center where users can:
+
+- View pending actions
+- Understand what needs to be done
+- Track priorities
+- Mark actions as completed
+- Keep completed actions synchronized across the application
+
+### Timeline
+
+The Timeline organizes actions according to their due dates, helping users understand upcoming responsibilities and deadlines.
+
+### Smart Reminders
+
+LifeLens AI automatically derives reminders from real extracted deadlines.
+
+Reminders are organized based on urgency:
+
 - Urgent
+- Reminder
 - Upcoming
-- Completed
-- Documents
-Create a section called:
-"Today's Actions"
-For now, show sample placeholder action cards.
-Create another section:
-"Recent Documents"
-Show placeholder document cards.
-Create a right/secondary section:
-"AI Insights"
-Show a placeholder message:
-"Your AI insights will appear here after LifeLens analyzes your information."
-IMPORTANT UX:
-The dashboard should feel like an "Action Center", not a traditional file manager.
-The primary question the UI should answer is:
-"What do I need to do?"
-Create reusable components for:
-- Sidebar
-- Header
-- StatCard
-- ActionCard
-- DocumentCard
-- PageContainer
-Do not hardcode the entire application into one component.
-Create a clean folder/component structure.
-Do not implement backend functionality yet.
-Do not implement real AI functionality yet.
-Do not add authentication yet.
-Do not add database functionality yet.
-Focus only on:
-1. Application shell
-2. Navigation
-3. Dashboard layout
-4. Design system
-5. Responsive UI
 
-This project was built with [Lovable](https://lovable.dev).
+Completed actions are automatically excluded from active reminders.
 
-**Live app**: https://lens-action-hub.lovable.app
+### Dashboard Insights
 
-## Build with Lovable
+The dashboard provides actionable insights based on the user's actual LifeLens data, including:
 
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/37e96d70-c7e1-4d5d-84a3-fae37f1635ae).
+- Overdue actions
+- Actions due today
+- Actions due tomorrow
+- Upcoming actions
+- Highest-priority pending action
+- Documents requiring attention
+- Deadline information
 
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
+### AI Assistant
 
-## Development
+The AI Assistant uses the user's analyzed LifeLens data to answer questions about their documents, actions, deadlines, and extracted information.
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+Responses are grounded in the information available in the user's LifeLens data.
+
+### Document Management
+
+Users can view analyzed documents and access their extracted information through the application.
+
+### Search
+
+Users can search their stored LifeLens information to quickly find relevant documents, actions, reminders, and extracted details.
+
+## Example Use Case
+
+### Internship Offer
+
+A user uploads an internship offer letter.
+
+LifeLens AI can identify:
+
+- Internship position
+- Joining date
+- Document submission deadline
+- Required documents
+- Office location
+- HR contact information
+- Joining instructions
+
+Instead of manually searching through the document, the user receives a structured set of actions and deadlines.
+
+## Technology Stack
+
+| Technology | Purpose |
+|---|---|
+| React | Frontend application |
+| TypeScript | Type-safe development |
+| Vite | Development and build tooling |
+| Tailwind CSS | Styling and responsive UI |
+| Lovable | Application development platform |
+| Lovable AI Gateway | AI model integration |
+| Google Gemini | AI-powered document analysis |
+| Zod | Schema validation |
+| Session Storage | Client-side persistence |
+
+## AI Analysis
+
+LifeLens AI uses a server-side AI analysis flow through the Lovable AI Gateway.
+
+Documents are processed according to their type, including:
+
+- PDF files
+- Images
+- Text files
+- DOCX documents
+- Pasted information
+
+The AI output is validated using a structured Zod schema before being converted into application data.
+
+The system is designed to prioritize information provided by the user and avoid inventing unsupported details.
+
+## Application Flow
+
+```text
+User Information
+       ↓
+Upload / Paste
+       ↓
+AI Analysis
+       ↓
+Structured Information
+       ↓
+Action Extraction
+       ↓
+Action Center
+       ↓
+Timeline + Reminders
+       ↓
+Dashboard Insights
+       ↓
+AI Assistant
 
 ```sh
 git clone <this-repository-url>
