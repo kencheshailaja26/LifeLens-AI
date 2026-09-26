@@ -138,28 +138,128 @@ The system is designed to prioritize information provided by the user and avoid 
 
 ## Application Flow
 
-```text
 User Information
-       ↓
+↓
 Upload / Paste
-       ↓
+↓
 AI Analysis
-       ↓
+↓
 Structured Information
-       ↓
+↓
 Action Extraction
-       ↓
+↓
 Action Center
-       ↓
+↓
 Timeline + Reminders
-       ↓
+↓
 Dashboard Insights
-       ↓
+↓
 AI Assistant
 
-```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
+## Data Flow
+
+LifeLens AI uses a shared persisted analysis and action data model across the application.
+
+Analyzed information flows through the main features:
+
+Documents
+↓
+Analysis
+↓
+Actions
+↓
+Timeline
+↓
+Reminders
+↓
+Dashboard Insights
+↓
+AI Assistant
+
+This keeps extracted information and action status synchronized across the application.
+
+## Target Users
+
+LifeLens AI is designed for people who regularly receive important information from multiple sources.
+
+Primary users include:
+
+- Students
+- Interns
+- Job seekers
+- Young professionals
+- Freelancers
+- Busy professionals
+
+## Project Structure
+
+src/
+├── components/
+├── data/
+├── lib/
+├── routes/
+└── ...
+
+public/
+
+The application uses reusable React components and separates routes, UI components, data handling, and utility logic.
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js
+- npm
+
+### Installation
+
+Clone the repository:
+
+git clone https://github.com/kencheshailaja26/LifeLens-AI.git
+
+Navigate to the project:
+
+cd LifeLens-AI
+
+Install dependencies:
+
+npm install
+
+Start the development server:
+
 npm run dev
-```
+
+## Current Project Status
+
+LifeLens AI currently includes:
+
+- Responsive dashboard
+- Document upload and analysis
+- Real AI-powered document analysis
+- Structured information extraction
+- Action Center
+- Timeline
+- Smart Reminders
+- Dashboard Insights
+- AI Assistant
+- Document management
+- Search
+- Persistent application data
+- Action completion synchronization
+- Responsive mobile layout
+
+## Future Improvements
+
+Potential future improvements include:
+
+- User authentication
+- Cloud database persistence
+- Cross-device synchronization
+- Email and calendar integrations
+- Push notifications
+- Additional document formats
+- Advanced personalization
+
+## License
+
+This project is currently not distributed under an open-source license.
